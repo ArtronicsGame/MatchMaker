@@ -1,0 +1,23 @@
+{
+    "files.associations": {
+        "iosfwd": "cpp",
+        "fstream": "cpp"
+    },
+    "mongoRunner": {
+        "connections": [
+            {
+                "name": "Artronic DB",
+                "url": "mongodb://193.176.243.42:46620/HeroesDB"
+            }
+        ]
+    },
+    "sshextension.serverList": [
+        {
+            "name": "Artronic Cloud",
+            "host": "193.176.243.42",
+            "port": 22,
+            "username": "centos",
+            "password": "alivaman"
+        }
+    ]
+}
