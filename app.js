@@ -5,7 +5,7 @@ const axios = require('axios');
 const HEROES = ["IceMan", "BlackHole", "Healer", "Tank", "Wizard", "Cloner", "Invoker", "ClockMan"];
 const HEROES_INDEX = { IceMan: 0, BlackHole: 1, Healer: 2, Tank: 3, Wizard: 4, Cloner: 5, Invoker: 6, ClockMan: 7 };
 const MAX_DEPTH = 6;
-const MATCH_SIZE = 2;
+const MATCH_SIZE = 1;
 const BOT_LIMIT = 10000;
 const MATCH_PORT = 40123;
 
@@ -33,20 +33,19 @@ for (var i = 0; i < 100; i++) {
 }
 
 function startMatch(group) {
-    axios.post('http://localhost:254/bestPort', { raw: group })
+    console.log("Starting Match");
+    axios.post('http://localhost:1243/createMatch', { raw: group })
         .then(function (response) {
             console.log(response.data);
             var res = {
                 _type: "MatchPlace",
                 _info: {
                     matchPort: response.data.port,
-                    matchId: response.data.matchId,
-                    fakeId: 0
+                    matchIP: "5.253.27.99"
                 }
             }
             var arr = JSON.parse(group);
             for (var i = 0; i < arr.length; i++) {
-                res._info.fakeId = response.data.fakeId[i];
                 IdMap.get(arr[i]).write(JSON.stringify(res));
                 IdMap.delete(arr[i]);
             }
@@ -239,12 +238,6 @@ function cancelMatch(id, socket) {
 function newMatch(id, socket) { //info contains id
     // var data = user[info["_id"]]; // Internal Test
 
-    var group = [];
-    group.push(id);
-    startMatch(JSON.stringify(group));
-
-    return;
-
     RedisDB.multi([
         ['hget', id, 'Trophies'],
         ['hget', id, 'CurrentHero']
@@ -310,13 +303,6 @@ var MatchServer = net.createServer(function (socket) {
     });
 
     socket.on('data', function (data) {
-        // if (data.toString().length % 2 == 0)
-        //     newMatch('5c61dbadf6e2ce5929423572', null);
-        // else
-        //     newMatch('5c61dbf97af24959392825fb', null);
-
-        // return;
-
         var raw = JSON.parse(data.toString());
         if (raw["_type"] == "New" && !state) {
             IdMap.set(raw["_info"]["id"], socket);
